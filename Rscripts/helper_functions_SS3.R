@@ -35,7 +35,7 @@ for_ncCPUE <- function(x, dir_save){
   Dev           <-Obs$value-CPUE$value
   stDev         <-Dev/sd(Dev,na.rm=T)
   CPUE          <-cbind(CPUE,Obs$value,Dev,stDev)
-
+  
   colnames(CPUE)<-c(coldims,'Exp','Obs','Dev','stDev')
   CPUE_data     <- CPUE
   return(CPUE_data)
@@ -53,7 +53,7 @@ read_CPUE_data <- function(model,run, dir_save){
 for_ncLEN <- function(x, dir_save){
   nc           <-nc_open(paste(dir_save,x, sep=""))
   Lobs         <-ncvar_get(nc,'Obs_len')
-
+  
   dims         <-list(nc$dim$fleet$vals,nc$dim$year$vals,nc$dim$season$vals,nc$dim$lenbin$vals)
   coldims      <-c('Fleet','Year','Season','Bin')
   dr           <-NULL
@@ -99,10 +99,10 @@ for_ncRecDev  <- function(x, dir_save){
   ## recruitment deviation uci (recdev$Value + 1.96 * recdev$Parm_StDev)
   RD_uci      <-ncvar_get(nc,'RecDev_uci')
   rd_uci      <-melt(RD_uci)
-
+  
   recdev      <-cbind(rd_val,rd_lci$value,rd_uci$value)
   colnames(recdev)<-c('Year','value','lci','uci')
-
+  
   RecDev_data <- recdev
   return(RecDev_data)
 }
@@ -162,7 +162,7 @@ for_ncSSB <- function(x, dir_save){
   era.vals<-NULL
   for(x in 1:length(xx.vals)){era.vals=c(era.vals,xx.vals[[x]][2])}
   
-    dims        <- list(nc$dim$area$vals,nc$dim$year$vals,nc$dim$season$vals,era.vals)
+  dims        <- list(nc$dim$area$vals,nc$dim$year$vals,nc$dim$season$vals,era.vals)
   coldims     <- c('Area','Year','Season','Era')
   dr          <- NULL
   for(d in 1:length(dims)){if(length(dims[[d]])==1){dr=c(dr,d)}}
@@ -223,7 +223,7 @@ read_Bio_data <- function(model,run, dir_save){
 
 for_ncffmsy <- function(x, dir_save){
   nc          <- nc_open(paste(dir_save,x, sep=""))
-  FFmsy       <- ncvar_get(nc,'F.Fmsy')
+  FFmsy       <- ncvar_get(nc,'FFmsy')
   
   dims        <- list(nc$dim$year$vals)
   dr          <- NULL
@@ -233,7 +233,7 @@ for_ncffmsy <- function(x, dir_save){
   
   ffmsy       <- melt(FFmsy)
   
-  colnames(ffmsy)<-c('Year','F.Fmsy')
+  colnames(ffmsy)<-c('Year','FFmsy')
   ffmsy_data  <- ffmsy
   return(ffmsy_data)
 }
@@ -250,6 +250,8 @@ read_ffmsy_data <- function(model,run, dir_save){
 for_ncSsel <- function(x, dir_save){
   nc          <- nc_open(paste(dir_save,x, sep=""))
   Ssel        <- ncvar_get(nc,'sizeselex')
+  end_yr        <- ncatt_get(nc,0)
+  end_yr<-end_yr$model_end_year
   
   ## MUST PARSE UNITS STRING INTO VALUES
   xx=nc$dim$size.factor$units
@@ -265,9 +267,10 @@ for_ncSsel <- function(x, dir_save){
   dims[dr]    <- NULL
   if(length(dr)>0){coldims     <- coldims[-dr]}
   dimnames(Ssel)<-dims
-
+  
   ssel        <- melt(Ssel)
-  colnames(ssel)<-c(coldims,'sel')
+  ssel$endyr  <- end_yr
+  colnames(ssel)<-c(coldims,'sel','endyr')
   Ssel_data   <- ssel
   return(Ssel_data)
 }
@@ -313,3 +316,11 @@ plot_output_VPA <- function(data_runs, vari){
   #h1$save('essai.html', standalone=TRUE)
   return(h1)
 }
+
+# ##### RELOADS UPDATED ss3.24.R to INFRASTRUCTURE ####
+# overwrite<-T #SET TO "TRUE" IF THE FILES ALREADY ON THE WORKSPACE SHOULD BE OVERWRITTEN
+# outputs_WS <- paste("/Home",username,"Workspace/IOTC_SS3_Shiny/Rscripts",sep="/")
+# listWS(outputs_WS) #GET THE LIST OF FILES AND FOLDERS IN ONE SUB-FOLDER
+# helper_SS3=paste('/home/anne.elise.nieblas/SS3/IOTC_SS3_Shiny/Rscripts/helper_functions_SS3.R',sep='') # FILE WITH THE FUNCTION TO WRITE OGC 19115 metadata
+# uploadWS(outputs_WS,helper_SS3,overwrite)
+# #####################################################
