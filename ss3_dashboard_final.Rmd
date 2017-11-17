@@ -8,69 +8,63 @@ runtime: shiny
 
 ```{r global, include=FALSE}
 
-### AEN TO DO: Is there a way to have a sidebar for each page whose options are linked to all pages?
-##             Add another model run for each spp!! 
+### AEN TO DO: Is there a way to have a sidplebar for each page whose options are linked to all pages?
+##             Add another model run for each spp!! (how to change line colors, etc for other runs??)
 ##             Add FLEET NAMES (outputs2netcdf)
-##             Add SKJ and BFT, grid
-##             Figure out ggplotly so that plots become interactive (why does it work for cpue fit and not the rest?)
-##             Add short description of each selected run in the sidebar?
-##             If models don't have multiple runs, don't allow 'multiple' to be selected
 
-############### DEFINE VRE DIRECTORIES ###############
-##     COMMENTED OUT FOR LOCAL USE
-# rm(list=ls())
-# username <- "anne.elise.nieblas"
-# token <- "a563a139-397a-41c0-8d48-765a881ddcfb-843339462"
-# source("http://svn.research-infrastructures.eu/public/d4science/gcube/trunk/data-analysis/RConfiguration/RD4SFunctions/workspace_interaction.r")
-# 
-# home_dir <-paste("/home/",username,"/",sep="")
-# setwd(home_dir)
-# SS3_dir="SS3"
-# directories=c(SS3_dir,"any_folder")
-# unlink(directories, recursive = TRUE)
-# 
-# ## CREATE REPOSITORIES IN RSTUDIO 
-# if (file.exists(SS3_dir)){
-#   setwd(file.path(home_dir, SS3_dir))
-# } else {
-#   dir.create(file.path(home_dir, SS3_dir))
-#   setwd(file.path(home_dir, SS3_dir))
-# }
-# 
-# # remote folder to download
-# folderss<-paste("/Home/",username,"/Workspace/IOTC_SS3_Shiny/",sep="") 
-# # download the folder content locally
-# downloadFolderWS(folderss) 
-# # opts_knit$set(root.dir =(paste(home_dir,SS3_dir,"/IOTC_SS3_Shiny",sep="")))
-# setwd(paste(home_dir,SS3_dir,"/IOTC_SS3_Shiny",sep=""))
+############### DEFINE MAIN DIRECTORIES ###############
+##rm(list=ls())
+##username <- "anne.elise.nieblas"
+##token <- "a563a139-397a-41c0-8d48-765a881ddcfb-843339462"
+##source("http://svn.research-infrastructures.eu/public/d4science/gcube/trunk/data-analysis/RConfiguration/RD4SFunctions/workspace_interaction.r")
 
-# dirMain     <- "~/Documents/BLUEBRIDGE/SHINY/shiny_SS3/"
-# dirMain <-getwd()
-########################################################
+home_dir <-paste("/home/",username,"/",sep="")
+setwd(home_dir)
+SS3_dir="SS3"
+directories=c(SS3_dir,"any_folder")
+unlink(directories, recursive = TRUE)
 
-############### DEFINE LOCAL DIRECTORIES ###############
-#     COMMENT OUT FOR USE ON VRE
-dirMain     <- "~/Documents/BLUEBRIDGE/SHINY/shiny_SS3_Git/"
-dirRScripts <- paste(dirMain,"Rscripts/",sep='')
-########################################################
+## CREATE REPOSITORIES IN RSTUDIO 
+if (file.exists(SS3_dir)){
+  setwd(file.path(home_dir, SS3_dir))
+} else {
+  dir.create(file.path(home_dir, SS3_dir))
+  setwd(file.path(home_dir, SS3_dir))
+}
 
-################### DATA DIRECTORY #####################
-#     USE THE THREDDS ADDRESS WHEN DATA ARE UPDATED
+# remote folder to download
+folderss<-paste("/Home/",username,"/Workspace/IOTC_SS3_Shiny/",sep="") 
+# download the folder content locally
+downloadFolderWS(folderss) 
+setwd(paste(home_dir,SS3_dir,"/IOTC_SS3_Shiny",sep=""))
+
+dirMain <-getwd()
+
+dirRScripts <- paste(dirMain,"/Rscripts/",sep='')
+
 # parameter and run/seed info
-dirData     <- paste(dirMain, "data/", sep="")
-# dirData  <- "https://thredds.d4science.org/thredds/fileServer/public/netcdf/IOTC_SS3_Stock_Assessment_Model_Outputs_Samples/"
-########################################################  
-
+dirWS    <- paste(dirMain, "/data/", sep="")
+# dirData    <- paste(dirMain, "/data/", sep="")
+dirData <-"http://mdst-macroes.ird.fr:8080/thredds/dodsC/BlueBridge/IOTC/"
+#######################################################
 
 ########### SOURCE LIBRARIES AND FUNCTIONS ############
+# library(shiny)
+# require(rCharts)
+# library(plyr)
+# # library(r4ss)
+# library(reshape)
+# library(ggplot2)
+# library(ncdf4)
+
 # devtools::install_github('hadley/ggplot2')
 if(!require("pacman")) install.packages("pacman")
 library(pacman)
-p_load(shiny, rCharts, plyr, reshape2, ggplot2, ncdf4, flexdashboard, plotly,googleVis)
+p_load(shiny, rCharts, plyr, reshape2, ggplot2, ncdf4, flexdashboard, plotly)
 
 
 # source(paste(dirRScripts,'plot_outputs_SS3.R',sep=''))
-run_parameters <- read.csv(paste(dirData, "run_spec_ss3.csv", sep=""))
+run_parameters <- read.csv(paste(dirWS, "run_spec_ss3.csv", sep=""))
 r_seed <- 1
 #######################################################
 
@@ -98,7 +92,7 @@ source(paste(dirRScripts,'helper_functions_SS3.R',sep=''))
 
 ```
 
-  CPUE
+CPUE
 ===================================== 
 Column {.sidebar}
 -----------------------------------------------------------------------
@@ -109,7 +103,7 @@ Compare observations against the predictions of selected SS3 model(s) for CPUE.
 
 ```{r}
 selectizeInput(inputId='Model',label='Select from the species models currently available',
-              choices=c('simple','SWO','YFT','BET','SKJ','BFT'),selected='SWO',multiple = FALSE)
+              choices=c('simple','SWO','YFT','BET'),selected='SWO',multiple = FALSE)
   selectInput(inputId='RunMode',label='Select one or multiple runs to visualize',
                  choices=c('One', 'Multiple'),selected='One',multiple = FALSE)
   conditionalPanel(condition  = "input.RunMode == 'Multiple'",
@@ -152,21 +146,21 @@ renderPlotly({
 
 ### Standardized CPUE residuals
 ```{r}
-renderPlot({
+renderPlotly({
     CPUE2plot <- CPUE_plot()
     ################# CPUE STANDARDIZED RESIDUALS ###################
     p <- ggplot(na.exclude(CPUE2plot), aes(x=Year, y=stDev, colour=Model_run))
-    p+geom_point()+geom_line()+
+    p <-  p+geom_point()+geom_line()+
       facet_wrap(~Fleet,ncol=2)+geom_abline(intercept = -2,slope=0, col="blue",linetype=2)+
       geom_abline(intercept = 2,slope=0, col="blue",linetype=2)+
       geom_abline(intercept = 0,slope=0, col="blue",linetype=2)#+ggtitle("Standardized CPUE residuals")
-    # ggplotly(q)
+    ggplotly(p)
     #################################################################
   })
 
 ```
 
-  Size Frequency
+Size Frequency
 ===================================== 
 Column {.sidebar}
 -----------------------------------------------------------------------
@@ -180,15 +174,16 @@ Column {.tabset}
 
 ### Aggregated Length Frequency
 ```{r}
-renderPlot({
+renderPlotly({
     LEN2plot <- LEN_plot()
     ###################### AGGREGATE LENGTH FREQUENCY ########################
     forLen <- ddply(na.exclude(LEN2plot), .(Fleet,Bin,Model_run), function(x) data.frame(Obs=sum(x$Obs), Exp=sum(x$Exp)))
     
     p <- ggplot(forLen, aes(x=Bin, y=Obs))
-    p+geom_bar(stat="identity")+facet_wrap(~Fleet, ncol=2, scales="free")+
+    p <- p+geom_bar(stat="identity")+facet_wrap(~Fleet, ncol=3, scales="free")+
       geom_line(aes(y=Exp,colour=Model_run),size=1.3)#+ 
       # ggtitle("Aggregated length frequency")
+    ggplotly(p)
     ##########################################################################
     
   })
@@ -196,14 +191,16 @@ renderPlot({
 
 ### Mean Length Distribution
 ```{r}
-renderPlot({
+renderPlotly({
     LEN2plot<-LEN_plot()
     ##################### MEAN LENGTH DISTRIBUTION ###########################
     forLen2 <- ddply(na.exclude(LEN2plot), .(Fleet,Year,Model_run), function(x) data.frame(Obs=weighted.mean(x=x$Bin, w=x$Obs), 
                                                                            Exp=weighted.mean(x=x$Bin, w=x$Exp) ))
     p <- ggplot(forLen2, aes(x=Year, y=Obs))
-    p+geom_point()+geom_line(col="black")+geom_line(aes(y=Exp,colour=Model_run),size=1.3)+
-      facet_wrap(~Fleet,scales = 'free', ncol=2)#+ 
+    p <- p+geom_point()+geom_line(col="black")+geom_line(aes(y=Exp,colour=Model_run),size=1.3)+
+      facet_wrap(~Fleet,scales = 'free', ncol=3)
+    ggplotly(p)
+    #+ 
       # ggtitle("Mean Length Distribution")
     ##########################################################################
 })
@@ -212,13 +209,14 @@ renderPlot({
 
 ### Mean Weight Distribution
 ```{r}
-renderPlot({
+renderPlotly({
     LEN2plot<-LEN_plot()
     ##################### MEAN LENGTH DISTRIBUTION ###########################
     forLenWeight <- ddply(na.exclude(LEN2plot), .(Fleet,Year,Model_run), function(x) data.frame(Obs=3.815e-006*(weighted.mean(x=x$Bin, w=x$Obs))^3.188,                                                     Exp= 3.815e-006*(weighted.mean(x=x$Bin, w=x$Exp))^3.188 ))
     p <- ggplot(forLenWeight, aes(x=Year, y=Obs))
-    p+geom_point()+geom_line(col="black")+geom_line(aes(y=Exp,colour=Model_run),size=1.3)+
-      facet_wrap(~Fleet, scales='free',ncol=2)
+    p <- p+geom_point()+geom_line(col="black")+geom_line(aes(y=Exp,colour=Model_run),size=1.3)+
+      facet_wrap(~Fleet, scales='free',ncol=3)
+    ggplotly(p)
     #+ 
       # ggtitle("Mean Weight Distribution")
     ##########################################################################
@@ -239,7 +237,7 @@ Column {.tabset}
 
 ### Total Biomass by Area
 ```{r}
-renderPlot({
+renderPlotly({
   Bioplot<-Bio_plot()
   ########################## TOTAL BIOMASS BY AREA ########################
   ## AREA,YEAR,SEASON,ERA
@@ -252,8 +250,9 @@ renderPlot({
     forBA0<-forBA[which(forBA$bio>0),]
   
   p <- ggplot(forBA0, aes(x=Year, y=bio,colour=Model_run))
-  p+geom_line(stat="identity",size=1.3)+facet_wrap(~Area, ncol=2)+ylab('Total Biomass (x1000 t)')+
+  p <- p+geom_line(stat="identity",size=1.3)+facet_wrap(~Area, ncol=2)+ylab('Total Biomass (x1000 t)')+
      geom_vline(xintercept = end_current_period,col="blue",linetype=2)
+  ggplotly(p)
   #########################################################################
  
 })
@@ -261,7 +260,7 @@ renderPlot({
 
 ### Total Biomass
 ```{r}
-renderPlot({
+renderPlotly({
   Bioplot<-Bio_plot()
    end_current_period=max(Bioplot$Year[Bioplot$Era=='TIME' & is.na(Bioplot$bio)==FALSE])
   ########################## TOTAL BIOMASS (SUMMED OVER AREA) ########################
@@ -273,8 +272,9 @@ renderPlot({
   forBAtot0<-forBAtot[which(forBAtot$bio>0),]
   
   p <- ggplot(forBAtot0, aes(x=Year, y=bio,colour=Model_run))
-  p+geom_line(stat="identity",size=1.3)+ylab('Total Biomass (x1000 t)')+ylim(range(forBAtot$bio))+
+  p <- p+geom_line(stat="identity",size=1.3)+ylab('Total Biomass (x1000 t)')+ylim(range(forBAtot$bio))+
      geom_vline(xintercept = end_current_period,col="blue",linetype=2)
+  ggplotly(p)
   #########################################################################
  
 })
@@ -282,7 +282,7 @@ renderPlot({
 
 ### Depletion by Area
 ```{r}
-renderPlot({
+renderPlotly({
   Bioplot<-Bio_plot()
   end_current_period=max(Bioplot$Year[Bioplot$Era=='TIME' & is.na(Bioplot$bio)==FALSE])
   forBA <- ddply(na.exclude(Bioplot), .(Area,Year,Model_run),
@@ -293,16 +293,17 @@ renderPlot({
   
   ######################## % DEPLETION BY AREA ############################
   p <- ggplot(forBA0, aes(x=Year, y=bio/bio[1]*100,colour=Model_run))
-  p+geom_line(stat="identity",size=1.3)+facet_wrap(~Area, ncol=2)+ylab('Depletion (%)')+
+  p <- p+geom_line(stat="identity",size=1.3)+facet_wrap(~Area, ncol=2)+ylab('Depletion (%)')+
  geom_hline(yintercept=40,col='dark grey')+
      geom_vline(xintercept = end_current_period,col="blue",linetype=2)
+  ggplotly(p)
   #########################################################################
    })
 ```
 
 ### Depletion
 ```{r}
-renderPlot({
+renderPlotly({
   Bioplot<-Bio_plot()
   end_current_period=max(Bioplot$Year[Bioplot$Era=='TIME' & is.na(Bioplot$bio)==FALSE])
   
@@ -314,9 +315,10 @@ renderPlot({
     forBAtot0<-forBAtot[which(forBAtot$bio>0),]
   
   p <- ggplot(forBAtot0, aes(x=Year, y=bio/bio[1]*100,colour=Model_run))
-  p+geom_line(stat="identity",size=1.3)+ylab('Depletion (%)')+ylim(0,max(forBAtot0$bio/forBAtot0$bio[1]*100))+
+  p <- p+geom_line(stat="identity",size=1.3)+ylab('Depletion (%)')+ylim(0,max(forBAtot0$bio/forBAtot0$bio[1]*100))+
      geom_hline(yintercept=40,col='dark grey')+
      geom_vline(xintercept = end_current_period,col="blue",linetype=2)
+  ggplotly(p)
   #########################################################################
    })
 ```
@@ -324,7 +326,7 @@ renderPlot({
 
 ### SSB by Area
 ```{r}
-renderPlot({
+renderPlotly({
   SSBplot<-SSB_plot()
   #################### SPAWNING STOCK BIOMASS BY AREA #####################
   forSSB <- ddply(na.exclude(SSBplot), .(Area,Year,Model_run),
@@ -335,7 +337,8 @@ renderPlot({
   forSSB<-forSSB[zeros,]
 
   p <- ggplot(forSSB, aes(x=Year, y=spbio,colour=Model_run))
-  p+geom_line(stat="identity",size=1.3)+facet_wrap(~Area, ncol=2)+ylab('Spawning Biomass (x1000 t)')
+  p <- p+geom_line(stat="identity",size=1.3)+facet_wrap(~Area, ncol=2)+ylab('Spawning Biomass (x1000 t)')
+  ggplotly(p)
   ##########################################################################
   
 })
@@ -343,7 +346,7 @@ renderPlot({
 
 ### SSB
 ```{r}
-renderPlot({
+renderPlotly({
   SSBplot<-SSB_plot()
   ####################### SPAWNING STOCK BIOMASS ########################### 
   forSSBtot <- ddply(na.exclude(SSBplot), .(Year,Model_run),
@@ -353,7 +356,8 @@ renderPlot({
   forSSBtot0<-forSSBtot[which(forSSBtot$spbio>0),]
   
   p <- ggplot(forSSBtot0, aes(x=Year, y=spbio,colour=Model_run))
-  p+geom_line(stat="identity",size=1.3)+ylab('Spawning Biomass (x1000 t)')
+  p <- p+geom_line(stat="identity",size=1.3)+ylab('Spawning Biomass (x1000 t)')
+  ggplotly(p)
   # ##########################################################################
   
 })
@@ -373,11 +377,12 @@ Column {.tabset}
 
 ### F/F_msy
 ```{r}
-renderPlot({
+renderPlotly({
   FFMSYplot<-FFMSY_plot()
   ####################### FFMSY (SUMMED OVER AREAS) ###########################
-   p <- ggplot(FFMSYplot, aes(x=Year, y=F.Fmsy,colour=Model_run))
-  p+geom_line(stat="identity",size=1.3)+ylab('F/Fmsy')
+   p <- ggplot(FFMSYplot, aes(x=Year, y=FFmsy,colour=Model_run))
+  p <- p+geom_line(stat="identity",size=1.3)+ylab('F/Fmsy')
+  ggplotly(p)
   ##########################################################################
 })
 ```
@@ -419,7 +424,7 @@ renderPlot({
 
 ### Recruitment by Area
 ```{r}
-renderPlot({
+renderPlotly({
   R0plot<-R0_plot()
   ####################### RECRUITMENT BY AREA ###########################
   forR0 <- ddply(na.exclude(R0plot), .(Area,Year,Model_run),
@@ -430,14 +435,15 @@ renderPlot({
   forR0<-forR0[zeros,]
 
   p <- ggplot(forR0, aes(x=Year, y=rec0,colour=Model_run))
-  p+geom_line(stat="identity",size=1.3)+facet_wrap(~Area, ncol=2)+ylab('Recruit 0 (x1000)')
+  p <- p+geom_line(stat="identity",size=1.3)+facet_wrap(~Area, ncol=2)+ylab('Recruit 0 (x1000)')
+  ggplotly(p)
   ##########################################################################
 })
 ```
 
 ### Total Recruitment 
 ```{r}
-renderPlot({
+renderPlotly({
   R0plot<-R0_plot()
   ####################### RECRUITMENT (SUMMED OVER AREAS) ###########################
   forR0 <- ddply(na.exclude(R0plot), .(Year,Model_run),
@@ -448,7 +454,8 @@ renderPlot({
   forR0<-forR0[zeros,]
 
   p <- ggplot(forR0, aes(x=Year, y=rec0,colour=Model_run))
-  p+geom_line(stat="identity",size=1.3)+ylab('Recruit 0 (x1000)')
+  p <- p+geom_line(stat="identity",size=1.3)+ylab('Recruit 0 (x1000)')
+  ggplotly(p)
   ##########################################################################
 })
 ```
@@ -465,14 +472,27 @@ Column {.tabset}
 -----------------------------------------------------------------------
 ### Size Selectivity
 ```{r}
-renderPlot({
+renderPlotly({
   Sselplot<-Ssel_plot()
   ####################### SIZE SELECTIVITY BY FLEET ###########################
-  forSize <- ddply(na.exclude(Sselplot), .(Fleet,Size,Model_run),
-                 function(x) data.frame(x[x$Gender==1 & x$Factor=="Lsel" & x$Year==2015,]))
+  if(length(grep('Gender',colnames(Sselplot)))>0){ forSize <- ddply(na.exclude(Sselplot), .(Fleet,Size,Model_run),
+                 function(x) data.frame(x[x$Gender==1 & x$Factor=="Lsel" & x$Year==x$endyr,]))
+  }else{forSize <- ddply(na.exclude(Sselplot), .(Fleet,Size,Model_run),
+                 function(x) data.frame(x[x$Factor=="Lsel" & x$Year==x$endyr,]))}
   p <- ggplot(forSize, aes(x=Size, y=sel,colour=Model_run))
-p+geom_line(stat="identity",size=1.3)+facet_wrap(~Fleet, ncol=5, scales="free")#+
-
+p <- p+geom_line(stat="identity",size=1.3)+facet_wrap(~Fleet, ncol=5, scales="free")#+
+ggplotly(p)
   ##########################################################################
 })
+```
+
+```{r}
+# ##### RELOADS UPDATED ss3.24.R to INFRASTRUCTURE ####
+# overwrite<-T #SET TO "TRUE" IF THE FILES ALREADY ON THE WORKSPACE SHOULD BE OVERWRITTEN
+# outputs_WS <- paste("/Home",username,"Workspace/IOTC_SS3_Shiny/",sep="/")
+# listWS(outputs_WS) #GET THE LIST OF FILES AND FOLDERS IN ONE SUB-FOLDER
+# shiny_SS3=paste('/home/anne.elise.nieblas/SS3/IOTC_SS3_Shiny/ss3_dashboard_final.Rmd',sep='') # FILE WITH THE FUNCTION TO WRITE OGC 19115 metadata
+# uploadWS(outputs_WS,shiny_SS3,overwrite)
+# #####################################################
+
 ```
