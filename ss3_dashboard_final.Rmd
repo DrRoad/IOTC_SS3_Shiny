@@ -103,7 +103,7 @@ Compare observations against the predictions of selected SS3 model(s) for CPUE.
 
 ```{r}
 selectizeInput(inputId='Model',label='Select from the species models currently available',
-              choices=c('simple','SWO','YFT','BET'),selected='SWO',multiple = FALSE)
+              choices=c('SWO','YFT','BET','SKJ','BFT'),selected='SWO',multiple = FALSE)
   selectInput(inputId='RunMode',label='Select one or multiple runs to visualize',
                  choices=c('One', 'Multiple'),selected='One',multiple = FALSE)
   conditionalPanel(condition  = "input.RunMode == 'Multiple'",
