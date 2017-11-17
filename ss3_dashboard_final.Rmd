@@ -8,9 +8,6 @@ runtime: shiny
 
 ```{r global, include=FALSE}
 
-### AEN TO DO: Is there a way to have a sidplebar for each page whose options are linked to all pages?
-##             Add another model run for each spp!! (how to change line colors, etc for other runs??)
-##             Add FLEET NAMES (outputs2netcdf)
 
 ############### DEFINE MAIN DIRECTORIES ###############
 ##rm(list=ls())
