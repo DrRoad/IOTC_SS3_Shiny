@@ -15,25 +15,25 @@ runtime: shiny
 ##token <- "a563a139-397a-41c0-8d48-765a881ddcfb-843339462"
 ##source("http://svn.research-infrastructures.eu/public/d4science/gcube/trunk/data-analysis/RConfiguration/RD4SFunctions/workspace_interaction.r")
 
-home_dir <-paste("/home/",username,"/",sep="")
-setwd(home_dir)
-SS3_dir="SS3"
-directories=c(SS3_dir,"any_folder")
-unlink(directories, recursive = TRUE)
+##home_dir <-paste("/home/",username,"/",sep="")
+##setwd(home_dir)
+##SS3_dir="SS3"
+##directories=c(SS3_dir,"any_folder")
+##unlink(directories, recursive = TRUE)
 
 ## CREATE REPOSITORIES IN RSTUDIO 
-if (file.exists(SS3_dir)){
-  setwd(file.path(home_dir, SS3_dir))
-} else {
-  dir.create(file.path(home_dir, SS3_dir))
-  setwd(file.path(home_dir, SS3_dir))
-}
+##if (file.exists(SS3_dir)){
+##  setwd(file.path(home_dir, SS3_dir))
+##} else {
+##  dir.create(file.path(home_dir, SS3_dir))
+##  setwd(file.path(home_dir, SS3_dir))
+##}
 
 # remote folder to download
-folderss<-paste("/Home/",username,"/Workspace/IOTC_SS3_Shiny/",sep="") 
+##folderss<-paste("/Home/",username,"/Workspace/IOTC_SS3_Shiny/",sep="") 
 # download the folder content locally
-downloadFolderWS(folderss) 
-setwd(paste(home_dir,SS3_dir,"/IOTC_SS3_Shiny",sep=""))
+##downloadFolderWS(folderss) 
+##setwd(paste(home_dir,SS3_dir,"/IOTC_SS3_Shiny",sep=""))
 
 dirMain <-getwd()
 
