@@ -22,8 +22,8 @@ dirRScripts <- paste(dirMain,"/Rscripts/",sep='')
 
 # parameter and run/seed info
 dirWS    <- paste(dirMain, "/data/", sep="")
-# dirData    <- paste(dirMain, "/data/", sep="")
-dirData <-"http://mdst-macroes.ird.fr:8080/thredds/dodsC/BlueBridge/IOTC/"
+dirData    <- paste(dirMain, "/data/", sep="")
+# dirData <-"http://mdst-macroes.ird.fr:8080/thredds/dodsC/BlueBridge/IOTC/"
 #######################################################
 
 ########### SOURCE LIBRARIES AND FUNCTIONS ############
