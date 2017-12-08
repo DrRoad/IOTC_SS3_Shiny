@@ -15,7 +15,7 @@ dirMain <-getwd()
 dirRScripts <- paste(dirMain,"/Rscripts/",sep='')
 
 # parameter and run/seed info
-dirWS <- "http://data.d4science.org/Y1NrS3pLQmNxTERueUlqUVo1cVVwKzF1NkQ1a1RaSWtHbWJQNStIS0N6Yz0"
+dirWS <- "http://data.d4science.org/bFZEb255ZkJia0NnbSs4U053dE9SVEh3MFNUbjFmN3BHbWJQNStIS0N6Yz0"
 # dirWS    <- paste(dirMain, "/data/", sep="")
 # dirData    <- paste(dirMain, "/data/", sep="")
 dirData <-"http://mdst-macroes.ird.fr:8080/thredds/dodsC/BlueBridge/IOTC/"
