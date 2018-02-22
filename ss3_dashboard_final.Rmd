@@ -39,7 +39,7 @@ r_seed <- 1
 
 
 ```{r, include=FALSE}
-source(paste(dirRScripts,'helper_functions_SS3_standard.R',sep=''))
+source(paste(dirRScripts,'helper_functions_SS3.R',sep=''))
 ## extract CPUE data from .nc files - Obs_cpue, Exp_cpue, Dev_cpue, and calculate standardised deviations
   CPUE_plot <- reactive({read_CPUE_data(paste(input$Model),input$Run, dir_save=paste(dirData,sep=''))})
 ## extract Lenbase data from .nc files - Obs_len, Exp_len
